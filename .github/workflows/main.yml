@@ -22,10 +22,10 @@ jobs:
             exit 1
           fi
 
-      - name: Patch Gradle files (fix syntax + dependency version)
+      - name: Patch Gradle files (fix syntax + dead ffmpeg-kit dependency)
         run: |
           sed -i 's/isMinifyEnabled = false/minifyEnabled false/' extracted/ClipCutter/app/build.gradle
-          sed -i 's/ffmpeg-kit-full-gpl:6.0-2/ffmpeg-kit-full-gpl:6.0-2.LTS/' extracted/ClipCutter/app/build.gradle
+          sed -i 's/com.arthenica:ffmpeg-kit-full-gpl:[^"]*/com.antonkarpenko:ffmpeg-kit-full-gpl:2.1.0/' extracted/ClipCutter/app/build.gradle
           cat extracted/ClipCutter/app/build.gradle
 
       - name: Set up JDK 17
