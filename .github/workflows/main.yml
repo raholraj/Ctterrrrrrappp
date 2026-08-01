@@ -22,9 +22,10 @@ jobs:
             exit 1
           fi
 
-      - name: Patch Groovy DSL syntax (fix isMinifyEnabled error)
+      - name: Patch Gradle files (fix syntax + dependency version)
         run: |
           sed -i 's/isMinifyEnabled = false/minifyEnabled false/' extracted/ClipCutter/app/build.gradle
+          sed -i 's/ffmpeg-kit-full-gpl:6.0-2/ffmpeg-kit-full-gpl:6.0-2.LTS/' extracted/ClipCutter/app/build.gradle
           cat extracted/ClipCutter/app/build.gradle
 
       - name: Set up JDK 17
