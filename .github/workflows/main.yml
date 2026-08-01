@@ -38,6 +38,11 @@ jobs:
         working-directory: extracted/ClipCutter
         run: gradle wrapper --gradle-version 8.7
 
+      - name: Patch Groovy DSL syntax (fix isMinifyEnabled error)
+        run: |
+          sed -i 's/isMinifyEnabled = false/minifyEnabled false/' extracted/ClipCutter/app/build.gradle
+          cat extracted/ClipCutter/app/build.gradle
+
       - name: Build debug APK
         working-directory: extracted/ClipCutter
         run: ./gradlew assembleDebug --stacktrace
