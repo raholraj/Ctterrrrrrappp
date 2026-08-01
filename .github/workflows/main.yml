@@ -28,6 +28,28 @@ jobs:
           sed -i 's/com.arthenica:ffmpeg-kit-full-gpl:[^"]*/com.antonkarpenko:ffmpeg-kit-full-gpl:2.1.0/' extracted/ClipCutter/app/build.gradle
           cat extracted/ClipCutter/app/build.gradle
 
+      - name: Fix LocalBroadcastManager import bug
+        run: |
+          find extracted/ClipCutter/app/src/main/java -name "*.kt" -exec \
+            sed -i 's/androidx\.core\.content\.LocalBroadcastManager/androidx.localbroadcastmanager.content.LocalBroadcastManager/g' {} +
+
+      - name: Detect real ffmpeg-kit package name and patch imports
+        run: |
+          curl -sSL -o /tmp/ffmpegkit.aar \
+            https://repo1.maven.org/maven2/com/antonkarpenko/ffmpeg-kit-full-gpl/2.1.0/ffmpeg-kit-full-gpl-2.1.0.aar
+          mkdir -p /tmp/aarcontents
+          unzip -o /tmp/ffmpegkit.aar -d /tmp/aarcontents
+          CLASS_PATH=$(unzip -l /tmp/aarcontents/classes.jar | grep -m1 -o '[A-Za-z0-9/_]*FFmpegKit\.class' || true)
+          if [ -z "$CLASS_PATH" ]; then
+            echo "Could not auto-detect package, falling back to com.arthenica.ffmpegkit"
+            PKG="com.arthenica.ffmpegkit"
+          else
+            PKG=$(dirname "$CLASS_PATH" | tr '/' '.')
+          fi
+          echo "Detected ffmpeg-kit package: $PKG"
+          find extracted/ClipCutter/app/src/main/java -name "*.kt" -exec \
+            sed -i "s/com\.arthenica\.ffmpegkit/$PKG/g" {} +
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
